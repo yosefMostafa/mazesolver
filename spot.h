@@ -125,10 +125,16 @@ public:
 		}
 	}
 	int getcount() {
+		count = 0;
+		for (int i = 0; i < 4; i++) {
+			if (p[i] == -1) {
+				count++;
+			}
+		}
 		return count;
 	}
 	int getitem() {
-		return item;
+  		return item;
 	}
 	rat* getrat() {
 		return R;

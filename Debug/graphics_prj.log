@@ -1,0 +1,4 @@
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  program.cpp
+D:\zewail\Semsters\Y2 Spring\Data structure\final assessement\q2\VC Graphics Library\mazesolver\program.cpp(145): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  graphics_prj.vcxproj -> D:\zewail\Semsters\Y2 Spring\Data structure\final assessement\q2\VC Graphics Library\mazesolver\.\Debug\graphics_prj.exe
