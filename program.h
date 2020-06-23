@@ -30,10 +30,8 @@ public:
 	void build2();
 
 	void solvemaze();
-
 	void getpositon(int i, int& posx, int& posy);
 	void set(int p[], int x, int y, int sx, int sy);
-	bool checkinter( int x, int y,int i);
 
 	void clearmem();
 	~program();
