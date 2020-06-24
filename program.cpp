@@ -1,6 +1,4 @@
 #include "program.h"
-#include<random>
-#include<ctime>
 
 
 
@@ -142,7 +140,6 @@ void program::simulate()
 	UpdateInterface();
 	spot* temp = &spots[R->getx()][R->gety()];
 	lastinter->push(temp);
-	srand(time(0));
 	solvemaze();
 	clearmem();
 }
@@ -155,7 +152,7 @@ void program::build2()
 	int tempy = y;
 	y = (x - 50) / 60;
 	x = (tempy - 110) / 60;
-	while (x > 0 && x < mazex && y > 0 && y < mazey) {
+	while (x > 0 && x < mazex-1 && y > 0 && y < mazey-1) {
 		
 		if (maze[x][y] == 1)
 			maze[x][y] = 0;
@@ -182,15 +179,15 @@ void program::solvemaze()
 		return;
 	}
 	spots[startx][starty].updatestatus();
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 4; i++) {
 		tempx = startx; tempy = starty; tempxs = -1; tempys = -1;
 	
-		int pos = rand() % 4;
-		getpositon(pos, tempx, tempy);
+		//int pos = rand() % 4;
+		getpositon(i, tempx, tempy);
 		if (lastposition->pop(tempys))
 			lastposition->pop(tempxs);
 
-		if (p[pos] == 1 && (tempys != tempy || tempxs != tempx)) {
+		if (p[i] == 1 && (tempys != tempy || tempxs != tempx)) {
 			
 			status temp;
 			lastposition->push(tempxs); lastposition->push(tempys);
@@ -201,12 +198,12 @@ void program::solvemaze()
 				//checkinter(tempspot,startx, starty, pos);
 			}
 			
-			if (checkinter(startx, starty, pos))
+			if (checkinter(startx, starty, i))
 				return;
 			//spots[startx][starty].updatestatus();
 			lastposition->push(startx);
 			lastposition->push(starty);
-			getpositon(pos, startx, starty);
+			getpositon(i, startx, starty);
 			assignrat(startx, starty);
 			UpdateInterface();
 
@@ -302,7 +299,7 @@ bool program::checkinter(int x, int y, int i)
 	int tempx=x, tempy=y,flag=-1;
 	getpositon(i, tempx, tempy);
 	while (lastinter->pop(tempinter)){
-		if (tempinter->getstatus() != continuing) {
+		//if (tempinter->getstatus() != continuing) {
 			if (tempinter->getx() == tempx && tempinter->gety() == tempy) {
 				int* p = spots[x][y].getsides();
 				p[i] = -1;
@@ -314,7 +311,7 @@ bool program::checkinter(int x, int y, int i)
 				//tempspot->updatestatus();
 				flag = 1;
 			}
-		}
+		
 			temp->push(tempinter);
 		
 }
