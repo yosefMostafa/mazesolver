@@ -1,5 +1,5 @@
 #include "program.h"
-
+#include "fstream"
 
 
 program::program()
@@ -77,9 +77,9 @@ void program::makingmaze()
 	UpdateInterfacem(initializing);
 }
 
-void program::RunProgram()
+void program::RunProgram(const int x,const int y)
 {
-	ActionType temp=pGUI->GetUserAction();
+	ActionType temp=pGUI->GetUserAction(x,y);
 	switch (temp)
 	{
 	case build:
@@ -87,6 +87,15 @@ void program::RunProgram()
 		break;
 	case sim:
 		simulate();
+		break;
+	case reenter:
+		makingmaze();
+		break;
+	case save:
+		save1();
+		break;
+	case load:
+		load1();
 		break;
 	case mod_count:
 		break;
@@ -113,8 +122,8 @@ void program::getinput(int &x,int &y)
 	pGUI->PrintMsg("Click on the mouse position .");
 	pGUI->waitmouseclick(x,y);
 	int tempy = y;
-	y = (x-50) / 60;
-	x = (tempy-110) / 60;
+	y = (x - 50) / pGUI->getGateWidth();
+	x = (tempy - 110) / pGUI->getgatehieght();
 }
 
 void program::assignrat( int x, int y)
@@ -149,9 +158,9 @@ void program::build2()
 	int x, y;
 	pGUI->PrintMsg("Click on the mouse to build .");
 	pGUI->waitmouseclick(x, y);
-	int tempy = y;
-	y = (x - 50) / 60;
-	x = (tempy - 110) / 60;
+	int tempy = y,tempx=x;
+	y = (x - 50) /pGUI->getGateWidth();
+	x = (tempy - 110) / pGUI->getgatehieght();
 	while (x > 0 && x < mazex-1 && y > 0 && y < mazey-1) {
 		
 		if (maze[x][y] == 1)
@@ -160,10 +169,11 @@ void program::build2()
 			maze[x][y] = 1;
 		UpdateInterfacem(building, x, y);
 		pGUI->waitmouseclick(x, y);
-		tempy = y;
-		y = (x - 50) / 60;
-		x = (tempy - 110) / 60;
+		tempy = y; tempx = x;
+		y = (float(x) - 50) / pGUI->getGateWidth();
+		x = (tempy - 110) / pGUI->getgatehieght();
 	}
+	RunProgram(tempx, tempy);
 }
 
 void program::solvemaze()
@@ -172,8 +182,10 @@ void program::solvemaze()
 	int* p = spots[startx][starty].getsides();
 	int tempx, tempy, tempxs, tempys;
 
-	if (spots[startx][starty].getstatus() == exit1)
+	if (spots[startx][starty].getstatus() == exit1) {
+		pGUI->PrintMsg("Solved");
 		return;
+	}
 	if (spots[startx][starty].getcount() == 4) {
 		pGUI->PrintMsg("No exite not a good start position");
 		return;
@@ -326,6 +338,59 @@ bool program::checkinter(int x, int y, int i)
 	return false;
 }
 
+void program::save1()
+{
+	pGUI->PrintMsg("Enter file name.");
+	string filename;
+	pGUI->GetString(filename);
+	ofstream file(filename+".txt");
+	if (!file) {
+		pGUI->PrintMsg("file open failuer");
+			Sleep(1000);
+			save1();
+	}
+	file << exitex << " " << exitey << endl;
+	file << mazex << " " << mazey << endl;
+
+	for (int i = 0; i < mazex; i++) {
+		for (int j = 0; j < mazey; j++)
+			file << maze[i][j] << " ";
+		file << endl;
+	}
+	file.close();
+	pGUI->PrintMsg("saved");
+}
+
+void program::load1()
+{
+	pGUI->PrintMsg("Enter file name.");
+	string filename;
+	pGUI->GetString(filename);
+	ifstream file(filename + ".txt");
+		if (!file) {
+			pGUI->PrintMsg("file not found");
+			Sleep(1000);
+			load1();
+		}
+		file >> exitex >> exitey;
+		file >> mazex >> mazey;
+		maze = new int* [mazex];
+		for (int i = 0; i < mazex; i++) {
+			int* temp = new int[mazey];
+			maze[i] = temp;
+		}
+		for (int i = 0; i < mazex; i++) {
+			for (int j = 0; j < mazey; j++)
+					file>>maze[i][j];	
+		}
+		file.close();
+
+		lastposition = new ArrayStack<int>(mazey * 18);
+		lastinter = new ArrayStack<spot*>(mazey * 6);
+		UpdateInterfacem(initializing);
+		pGUI->PrintMsg("loaded");
+}
+
 
 void program::clearmem()
 {
@@ -335,13 +400,14 @@ void program::clearmem()
 	}
 		while (lastinter->pop(temp2)) {}
 			
-		spots[exitex][exitey].setrat(nullptr);
-		UpdateInterface();
+		spots[R->getx()][R->gety()].setrat(nullptr);
 		
+		UpdateInterface();
+		R = nullptr;
 }
 
 program::~program()
-{
+{  
 	delete lastinter;
 	spot* temp2;
 	delete spots;

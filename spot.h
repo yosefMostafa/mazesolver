@@ -16,14 +16,14 @@ private:
 	int count;
 public:
 	spot() {
-		R = nullptr; x = -1; y = -1;
+		R = nullptr; x = -1; y = -1; count = 4;
 		for (int i = 0; i < 4; i++)
 			p[i] = -1;
 	}
 	spot(int **maze, int x1, int y1,int i) {
 		R = nullptr;
 		st = end1; x = x1, y = y1;
-		count;
+		count=4;
 		for (int i = 0; i < 4; i++)
 			p[i] = -1;
 		checkstatus(maze, x, y); item = i;
@@ -69,12 +69,6 @@ public:
 		return st;
 	}
 	void updatestatus() {
-		count = 0;
-		for (int i = 0; i < 4; i++) {
-			if (p[i] == -1) {
-				count++;
-			}
-		}
 		switch (count)
 		{
 		case 2:setstatus(continuing);
@@ -119,18 +113,11 @@ public:
 		p = temp;
 		count = 0;
 		for (int i = 0; i < 4; i++) {
-			if (p[i] == -1) {
+			if (p[i] == -1)
 				count++;
-			}
 		}
 	}
 	int getcount() {
-		count = 0;
-		for (int i = 0; i < 4; i++) {
-			if (p[i] == -1) {
-				count++;
-			}
-		}
 		return count;
 	}
 	int getitem() {

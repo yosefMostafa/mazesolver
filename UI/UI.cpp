@@ -83,20 +83,20 @@ void UI::GetString(string &userInput)
 }
 int z = 0;
 //This function reads the position where the user clicks to determine the desired action
-ActionType UI::GetUserAction() 
+ActionType UI::GetUserAction(int x,int y) 
 {	
-	int x,y;
-	
-	if (z != 0) {
-		pWind->WaitMouseClick(x, y);//Get the coordinates of the user click
-		lastclicky = y;
-		lastclickx = x;
+	if (x == -1) {
+
+		if (z != 0) {
+			pWind->WaitMouseClick(x, y);//Get the coordinates of the user click
+			lastclicky = y;
+			lastclickx = x;
+		}
+		else {
+			z = 1;
+			y = 600, x = 600;
+		}
 	}
-	else {
-		z = 1;
-		y = 600, x = 600;
-	}
-	
 	if ((y >= 0 && y < ToolBarHeight) || (x > width - ToolItemWidth && y > (ToolBarHeight) && y < (height - StatusBarHeight)))
 	{
 		int ClickedItemOrder = (x / ToolItemWidth);
@@ -104,6 +104,9 @@ ActionType UI::GetUserAction()
 					{
 		case 0:return sim;
 		case 1:return build;
+		case 2:return reenter;
+		case 3:return save;
+		case 4:return load;
 					}
 	}
 	//if(AppMode == DESIGN )	//application is in design mode
@@ -176,6 +179,12 @@ void UI::CreateStatusBar() const
 	pWind->DrawString(60, 35, "Sim");
 	pWind->DrawRectangle(150, 0, 300, 95, FRAME);
 	pWind->DrawString(60+150, 35, "Build");
+	pWind->DrawRectangle(150+150, 0, 300+150, 95, FRAME);
+	pWind->DrawString(20 + 150+150, 35, "Re Enter Maze ");
+	pWind->DrawRectangle(150 + 150+150, 0, 300 + 150+150, 95, FRAME);
+	pWind->DrawString(60 + 150 + 150+150, 35, "Save");
+	pWind->DrawRectangle(150 *4, 0, 300 + 150 *3, 95, FRAME);
+	pWind->DrawString(60 + 150*4, 35, "Load");
 	pWind->SetPen(BLACK,3);
 	pWind->DrawLine(0, height-StatusBarHeight, width, height-StatusBarHeight);
 }
@@ -208,7 +217,7 @@ void UI::ClearStatusBar()const
 //Clears the drawing (degin) area
 void UI::ClearDrawingArea() const
 {
-	pWind->SetPen(RED, 1);
+	pWind->SetPen(BLACK, 1);
 	pWind->SetBrush(WHITE);
 	pWind->DrawRectangle(0, ToolBarHeight, width, height - StatusBarHeight);
 	
@@ -308,25 +317,33 @@ void UI::CreateSimulationToolBar()
 //TODO: Add similar functions to draw all components
 void UI::drawspot(spot** temp,rat *R)
 {
-	int tempx = 50	, tempy = 110;
+	float tempx = 50	, tempy = 110;
 	string Image;
 	
 	
 		int rx=R->getx(), ry=R->gety();
-		tempx = tempx + (ry-1) * GATE_Height ;
+		tempx = tempx + (ry-1) * GATE_Width ;
 		int x = tempx;
-		tempy = tempy + GATE_Width *(rx-1);
+		tempy = tempy + GATE_Height *(rx-1);
+		pWind->SetPen(BLACK);
 		for (int n = rx - 1; n < rx + 2; n++) {
 			for (int j = ry - 1; j < ry + 2; j++) {
-				if (temp[n][j].getitem() == 1)
-					Image = "photos\\black.jpg";
-				else
-					Image = "photos\\white.jpg";
-				if (temp[n][j].getrat())
+				if (temp[n][j].getrat()) {
 					Image = "photos\\rat.jpg";
-				if (temp[n][j].getstatus()==exit1)
+					pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+				}
+				else if (temp[n][j].getstatus() == exit1) {
 					Image = "photos\\exit.jpg";
-				pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+					pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+				}
+				else {
+					if (temp[n][j].getitem() == 1)
+						pWind->SetBrush(black);
+					else
+						pWind->SetBrush(WHITESMOKE);
+
+					pWind->DrawRectangle(tempx, tempy, tempx + GATE_Width, tempy + GATE_Height, FILLED);
+				}
 				tempx = tempx + GATE_Width;
 			}
 			tempy = tempy + GATE_Height;
@@ -337,17 +354,27 @@ void UI::drawspot(spot** temp,rat *R)
 }
 void UI::drawspot(int** maze, int mazex, int mazey,int exx,int exy, drawmode i, int x, int y)
 {
-	int tempx = 50, tempy = 110;
+	float tempx = 50, tempy = 110;
 	string Image;
-
+	GATE_Width = (float(width) - 100) / float(mazey);
+	GATE_Height = (float(height) - 120 - StatusBarHeight) / float(mazex);
+	pWind->SetPen(BLACK);
 	if (i == initializing) {
+		ClearDrawingArea();
 		for (int i = 0; i < mazex; i++) {
 			for (int j = 0; j < mazey; j++) {
 				if (maze[i][j] == 1)
-					Image = "photos\\black.jpg";
-				else
+					pWind->SetBrush(black);
+					//Image = "photos\\black.jpg";
+				else if(maze[i][j]==0)
+					pWind->SetBrush(WHITESMOKE);
+					//Image = "photos\\white.jpg";
+				if (i == exx && j == exy) {
 					Image = "photos\\exit.jpg";
-				pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+					pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+				}
+				else
+					pWind->DrawRectangle(tempx, tempy, tempx+GATE_Width, tempy+GATE_Height, FILLED);
 				tempx = tempx + GATE_Width;
 			}
 			tempy = tempy + GATE_Height;
@@ -355,16 +382,21 @@ void UI::drawspot(int** maze, int mazex, int mazey,int exx,int exy, drawmode i, 
 		}
 	}
 	else {
-		tempx = tempx + y * GATE_Height;
+		tempx = tempx + y * GATE_Width;
 		tempy = tempy + x * GATE_Height;
 
-		if (maze[x][y] == 1)
-			Image = "photos\\black.jpg";
-		else if(x==exx&&y==exy)
+		
+		if (x == exx && y == exy) {
 			Image = "photos\\exit.jpg";
-		else
-			Image = "photos\\white.jpg";
-		pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+			pWind->DrawImage(Image, tempx, tempy, GATE_Width, GATE_Height);
+		}
+		else {
+			if (maze[x][y] == 1)
+				pWind->SetBrush(black);
+			else
+				pWind->SetBrush(WHITESMOKE);
+			pWind->DrawRectangle(tempx, tempy, tempx + GATE_Width, tempy + GATE_Height, FILLED);
+		}
 	}
 }
 
@@ -430,6 +462,16 @@ int UI::getwidth() {
 }
 int UI::getStatusBarHeight() {
 	return StatusBarHeight1;
+}
+
+int UI::getgatewidth()
+{
+	return GATE_Width;
+}
+
+int UI::getgatehieght()
+{
+	return GATE_Height;
 }
 
 void UI::waitmouseclick(int& x, int& y)

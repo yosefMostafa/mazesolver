@@ -95,7 +95,8 @@ class UI
 
 	//This should be calculated accurately because it will be used later to create connections between gates
 	//For now, we will assume that rect width = 50 and height = 50
-	static const int	GATE_Width = 60,		//Gate Image default width
+	//static const 
+		float	GATE_Width = 60,		//Gate Image default width
 						GATE_Height = 60;		//Gate Image default height
 
 	window* pWind;
@@ -127,9 +128,11 @@ public:
 	int  getheight();
 	int  getwidth();
 	int getStatusBarHeight();
+	int getgatewidth();
+	int getgatehieght();
 	void waitmouseclick(int& x, int &y);
 
-	ActionType GetUserAction() ; //Reads the user click and maps it to an action
+	ActionType GetUserAction(int x,int y) ; //Reads the user click and maps it to an action
 
 	
 	// Output Functions  ---------------------------

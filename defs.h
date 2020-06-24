@@ -10,6 +10,9 @@ enum status {
 enum ActionType {
 	build,
 	sim,
+	reenter,
+	save,
+	load,
 
 	mod_count
 };
