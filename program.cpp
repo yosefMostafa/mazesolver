@@ -108,7 +108,7 @@ void program::RunProgram(const int x,const int y)
 void program::UpdateInterface()
 {
 	pGUI->drawspot(spots,R);
-	Sleep(100);
+	Sleep(50);
 }
 
 void program::UpdateInterfacem(drawmode i,const int x,const int y)
@@ -156,24 +156,57 @@ void program::simulate()
 void program::build2()
 {
 	int x, y;
-	pGUI->PrintMsg("Click on the mouse to build .");
-	pGUI->waitmouseclick(x, y);
-	int tempy = y,tempx=x;
-	y = (x - 50) /pGUI->getGateWidth();
-	x = (tempy - 110) / pGUI->getgatehieght();
-	while (x > 0 && x < mazex-1 && y > 0 && y < mazey-1) {
-		
-		if (maze[x][y] == 1)
-			maze[x][y] = 0;
-		else
-			maze[x][y] = 1;
-		UpdateInterfacem(building, x, y);
+	pGUI->PrintMsg("Enter build mode.0)keyboard 1)mouse");
+	string choice;
+	pGUI->GetString(choice);
+	if (choice == "1") {
+		pGUI->PrintMsg("Click on the mouse to build .");
 		pGUI->waitmouseclick(x, y);
-		tempy = y; tempx = x;
-		y = (float(x) - 50) / pGUI->getGateWidth();
+		int tempy = y, tempx = x;
+		y = (x - 50) / pGUI->getGateWidth();
 		x = (tempy - 110) / pGUI->getgatehieght();
+		while (x > 0 && x < mazex - 1 && y > 0 && y < mazey - 1) {
+
+			if (maze[x][y] == 1)
+				maze[x][y] = 0;
+			else
+				maze[x][y] = 1;
+			UpdateInterfacem(building, x, y);
+			pGUI->waitmouseclick(x, y);
+			tempy = y; tempx = x;
+			y = (float(x) - 50) / pGUI->getGateWidth();
+			x = (tempy - 110) / pGUI->getgatehieght();
+		}
+
+		RunProgram(tempx, tempy);
 	}
-	RunProgram(tempx, tempy);
+	else if (choice == "0") {
+		pGUI->PrintMsg("Enter the start pos.");
+		pGUI->waitmouseclick(x, y);
+		int tempy = y, tempx = x;
+		y = (x - 50) / pGUI->getGateWidth();
+		x = (tempy - 110) / pGUI->getgatehieght();
+		while (x > 0 && x < mazex - 1 && y > 0 && y < mazey - 1) {
+			if (maze[x][y] == 1)
+				maze[x][y] = 0;
+			UpdateInterfacem(building, x, y);
+			if (pGUI->getmouseclick(x,y) != NO_CLICK)
+				break;
+			char temp;
+			pGUI->WaitKeyPress(temp);
+				switch(temp)
+					{
+				case 'w':x = x - 1;
+					break;
+				case 's':x = x + 1;
+					break;
+				case 'd':y = y + 1;
+					break;
+				case'a':y = y - 1;
+					break;
+					}
+		}
+	}
 }
 
 void program::solvemaze()

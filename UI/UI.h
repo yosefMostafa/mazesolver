@@ -122,7 +122,7 @@ public:
 	void drawstring(int x, int y,string f);
 	void WaitKeyPress(char& cKey);
 	void getmousecor(int& x, int& y);
-	void getmouseclick(int& X, int& y);
+	clicktype getmouseclick(int& X, int& y);
 	int getToolBarHeight();
 	int  getToolItemWidth();
 	int  getheight();

@@ -445,8 +445,8 @@ void UI::WaitKeyPress(char& key) {
 void UI::getmousecor(int& x, int& y) {
 	pWind->GetMouseCoord(x, y);
 }
-void UI::getmouseclick(int& x, int& y) {
-	pWind->GetMouseClick(x, y);
+clicktype UI::getmouseclick(int& x, int& y) {
+	return pWind->GetMouseClick(x, y);
 }
 int UI::getToolBarHeight(){
 	return ToolBarHeight1;

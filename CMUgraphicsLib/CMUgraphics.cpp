@@ -511,8 +511,8 @@ clicktype window::GetMouseClick(int &iX, int &iY) {
 		return ctTmp;
 
 	} else {
-		iX = -1;
-		iY = -1;
+		/*iX = -1;
+		iY = -1;*/
 		return NO_CLICK;
 	}
 }

@@ -29,3 +29,9 @@ enum drawmode {
 	derw_count
 
 };
+enum buildmode {
+	keyboard,
+	mouse,
+
+	bumod_count
+};
